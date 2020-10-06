@@ -16,7 +16,7 @@ describe('Bicicletas.add', ()=>{
         Bicicleta.add(a)
 
         expect(Bicicleta.allBicis.length).toBe(1)
-        expect(Bicicleta.allBicis[0].toBe(a))
+        expect(Bicicleta.allBicis[0]).toBe(a)
 
     })
 })
