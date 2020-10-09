@@ -82,4 +82,4 @@ module.exports = mongoose.model('Bicicleta', bicicletaSchema);
 // Bicicleta.add(a);
 // Bicicleta.add(b);
 
-module.exports = Bicicleta;
+//module.exports = Bicicleta;

@@ -7,7 +7,8 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var bicicletasRouter = require('./routes/bicicletas');
-var bicicletasAPIRouter = require('./routes/api/bicicletas')
+var bicicletasAPIRouter = require('./routes/api/bicicletas');
+var usuariosAPIRouter = require('./routes/api/usuarios')
 
 var mongoose = require('mongoose');
 var mongoDB = 'mongodb://localhost/red_bicicletas';
@@ -33,6 +34,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/bicicletas', bicicletasRouter);
 app.use('/api/bicicletas', bicicletasAPIRouter);
+app.use('/api/usuarios', usuariosAPIRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
