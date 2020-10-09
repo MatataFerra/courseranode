@@ -1,4 +1,4 @@
-const usuario = require('../../models/usuario');
+
 var Usuario = require('../../models/usuario');
 
 exports.usuarios_list = (req, res) => {
