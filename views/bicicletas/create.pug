@@ -12,20 +12,23 @@ block content
     br
 
     form(action='/bicicletas/create' method='post')
-        label(for='id') ID:
-        input#id(type='text' name='id')
+            label(for='id') ID:
+            input#id(type='text' name='id')
+            br
+            label(for='color') color:
+            input#color(type='text' name='color')
+            br
+            label(for='modelo') modelo:
+            input#modelo(type='text' name='modelo')
+            br
+            label(for='latitud') latitud:
+            input#latitud(type='text' name='lat')
+            br
+            label(for='longitud') longitud:
+            input#longitud(type='text' name='lng')
+        
         br
-        label(for='color') color:
-        input#color(type='text' name='color')
         br
-        label(for='modelo') modelo:
-        input#modelo(type='text' name='modelo')
-        br
-        label(for='latitud') latitud:
-        input#latitud(type='text' name='lat')
-        br
-        label(for='longitud') longitud:
-        input#longitud(type='text' name='lng')
-        br
-        br
-        input.btn(type='submit' value='OK')
+        input.btn.btn-primary(type='submit' value='OK')
+
+
