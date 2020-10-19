@@ -15,6 +15,9 @@ var tokenRouter = require('./routes/token');
 var usuariosRouter = require('./routes/users')
 
 var mongoose = require('mongoose');
+const Usuario = require('./models/usuario');
+const Token = require('./models/token')
+const { token } = require('morgan');
 var mongoDB = 'mongodb://localhost/red_bicicletas';
 mongoose.connect(mongoDB, {useNewUrlParser: true});
 mongoose.Promise = global.Promise;
@@ -50,24 +53,68 @@ app.get('/login', (req, res)=>{
 })
 
 app.post('/login', (req, res, next)=> {
-  //passport
+  passport.authenticate('local', (err, user, info)=>{
+    if(err) return next(err);
+    if(!usuario) return res.render('session/login', {info});
+    req.logIn(usuario, err =>{
+      if(err) return next(err);
+      return res.redirect('/');
+    });
+  }) (req, res, next);
 })
 
 app.get('/logout', (req, res)=>{
+  req.logOut()
   res.redirect('/')
 })
 
 app.get('/forgotPassword', (req, res)=>{
-  
+  res.render('session/forgotPassword')
 })
 
 app.post('/forgotPassword', (req, res)=>{
-  
+  Usuario.findOne({email: req.body.email}, (err, usuario)=>{
+    if(!usuario) return res.render('session/forgotPassword', {info: {message: 'No existe la clave'}});
+    
+    usuario.resetPassword(err=>{
+      if(err) return next(err);
+      console.log('session/forgotPasswordMessage');
+    })
+    res.render('session/forgotPasswordMessage')
+  })
+})
+
+app.get('/resetPassword/:token', (req, res, next)=>{
+  Token.findOne({token: req.params.token}, (err, token)=>{
+    if(!token) return res.status(400).send({type: 'not-verified', msg: 'No existe una clave así'})
+
+    Usuario.findById(token._userId, (err, usuario)=>{
+      if(!usuario) return res.status(400).send({msg: 'No existe un usuario asociado a este password'});
+      res.render('session/resetPassword', {errors: {}, usuario: usuario})
+    })
+  })
+})
+
+app.post('/resetPassword', (req, res)=>{
+  if(req.body.password != req.body.confirm_password) {
+    res.render('session/resetPassword', {errors: {confirm_password: {message: 'No coinciden las contraseñas'}}});
+    return;
+  }
+  Usuario.findOne({email: req.body.email}, (err, usuario)=>{
+    usuario.password = req.body.password;
+    usuario.save(err=>{
+      if(err){
+        res.render('session/resetPassword', {errors: err.errors, usuario: new Usuario});
+      } else {
+        res.redirect('/login')
+      }
+    })
+  })
 })
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/bicicletas', bicicletasRouter);
+app.use('/bicicletas', loggedIn, bicicletasRouter);
 app.use('/api/bicicletas', bicicletasAPIRouter);
 app.use('/api/usuarios', usuariosAPIRouter);
 app.use('/token', tokenRouter);
@@ -88,5 +135,15 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+function loggedIn(req, res, next){
+  if(req.user){
+    next()
+  } else {
+    console.log('user sin loguearse');
+    res.redirect('/login')
+  }
+}
+
 
 module.exports = app;
