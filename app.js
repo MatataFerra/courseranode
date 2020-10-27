@@ -7,6 +7,8 @@ const passport = require('./config/passport');
 const session = require('express-session');
 const jwt = require('jsonwebtoken')
 
+//PassWord Mongo JD4OMXjPTAf6FqoV
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var bicicletasRouter = require('./routes/bicicletas');
@@ -22,7 +24,7 @@ const Usuario = require('./models/usuario');
 const Token = require('./models/token')
 const { token } = require('morgan');
 const authControllerAPI = require('./controllers/api/authControllerAPI');
-var mongoDB = 'mongodb://localhost/red_bicicletas';
+var mongoDB = 'mongodb+srv://admin:JD4OMXjPTAf6FqoV@red-bicicletas.2ew8p.mongodb.net/red-bicicletas?retryWrites=true&w=majority';
 mongoose.connect(mongoDB, {useNewUrlParser: true});
 mongoose.Promise = global.Promise;
 var db = mongoose.connection;
