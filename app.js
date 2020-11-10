@@ -1,3 +1,4 @@
+require('dotenv').config()
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -5,7 +6,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const passport = require('./config/passport');
 const session = require('express-session');
-const jwt = require('jsonwebtoken')
+const MongoDBStore = require('connect-mongodb-session')(session);
+const jwt = require('jsonwebtoken');
 
 //PassWord Mongo JD4OMXjPTAf6FqoV
 
@@ -24,13 +26,30 @@ const Usuario = require('./models/usuario');
 const Token = require('./models/token')
 const { token } = require('morgan');
 const authControllerAPI = require('./controllers/api/authControllerAPI');
-var mongoDB = 'mongodb+srv://admin:JD4OMXjPTAf6FqoV@red-bicicletas.2ew8p.mongodb.net/red-bicicletas?retryWrites=true&w=majority';
+const { assert } = require('console');
+//var mongoDB = 'mongodb+srv://admin:JD4OMXjPTAf6FqoV@red-bicicletas.2ew8p.mongodb.net/red-bicicletas?retryWrites=true&w=majority';
+var mongoDB = process.env.MONGO_URI
 mongoose.connect(mongoDB, {useNewUrlParser: true});
 mongoose.Promise = global.Promise;
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error'));
 
-const store = new session.MemoryStore;
+//const store = new session.MemoryStore;
+
+let store;
+if(process.env.NODE_ENV === 'development') {
+  store = new session.MemoryStore;
+} else {
+  store = new MongoDBStore({
+    uri: process.env.MONGO_URI,
+    collection: 'session'
+  });
+  store.on('error', (error)=>{
+    assert.ifError(error);
+    assert.ok(false)
+  })
+}
+
 var app = express();
 app.set('secretKey', 'jwt_pwd_!!223344');
 
@@ -118,7 +137,17 @@ app.post('/resetPassword', (req, res)=>{
       }
     })
   })
-})
+});
+
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile'] }));
+ 
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/');
+  });
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
