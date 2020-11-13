@@ -8,6 +8,7 @@ const passport = require('./config/passport');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const jwt = require('jsonwebtoken');
+require('newrelic');
 
 //PassWord Mongo JD4OMXjPTAf6FqoV
 
